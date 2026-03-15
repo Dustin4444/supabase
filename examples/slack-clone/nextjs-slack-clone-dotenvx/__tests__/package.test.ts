@@ -131,7 +131,7 @@ describe('package.json validation', () => {
     })
 
     test('all dependency versions should be valid', () => {
-      const validVersionRegex = /^[\^~]?\d+\.\d+\.\d+|latest$/
+      const validVersionRegex = /^([\^~]?\d+\.\d+\.\d+|latest)$/
       Object.entries(packageJson.dependencies).forEach(([name, version]) => {
         expect(version).toMatch(validVersionRegex)
       })
@@ -386,17 +386,10 @@ describe('package.json validation', () => {
       const versionNumber = supabaseVersion.replace('^', '')
       const [major, minor, patch] = versionNumber.split('.').map(Number)
       
-      const targetVersion = [2, 72, 8]
+      const currentVersionNum = major * 1000000 + minor * 1000 + patch
+      const minVersionNum = 2 * 1000000 + 72 * 1000 + 8
       
-      if (major > targetVersion[0]) {
-        expect(true).toBe(true)
-      } else if (major === targetVersion[0]) {
-        if (minor > targetVersion[1]) {
-          expect(true).toBe(true)
-        } else if (minor === targetVersion[1]) {
-          expect(patch).toBeGreaterThanOrEqual(targetVersion[2])
-        }
-      }
+      expect(currentVersionNum).toBeGreaterThanOrEqual(minVersionNum)
     })
 
     test('should not downgrade from version 2.72.8', () => {
@@ -405,8 +398,8 @@ describe('package.json validation', () => {
       
       // Parse version
       const [major, minor, patch] = versionNumber.split('.').map(Number)
-      const currentVersionNum = major * 10000 + minor * 100 + patch
-      const minVersionNum = 2 * 10000 + 72 * 100 + 8
+      const currentVersionNum = major * 1000000 + minor * 1000 + patch
+      const minVersionNum = 2 * 1000000 + 72 * 1000 + 8
       
       expect(currentVersionNum).toBeGreaterThanOrEqual(minVersionNum)
     })
